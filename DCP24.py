@@ -16,7 +16,6 @@
 class Btree:
     def __init__(self, length=0) -> None:
         self.root = None
-        self._internalValueList = [x for x in range(length)]
         self._internalLockList = [False for x in range(length)]
 
     def checkAncestors(self, index) -> bool:
@@ -29,7 +28,7 @@ class Btree:
         return self.checkAncestors(int((index+1)/2)-1 if index % 2 == 0 else int(index/2)-1)
 
     def checkDescendants(self, index) -> bool:
-        if index >= len(self._internalValueList):
+        if index >= len(self._internalLockList):
             print(True)
             return True
         if self._internalLockList[index]:
