@@ -1,52 +1,59 @@
+from copy import copy
 from typing import List
+from collections import deque
 
 
 class Solution:
-    def combinationSum2(self, candidates: List[int], target: int) -> List[List[int]]:
-        candidates.sort()
-        print(candidates)
-        candDict = {}
-        currentCand = candidates[0]
-        currentRange = [0]
-        for x in range(len(candidates)):
-            if candidates[x] != currentCand:
-                currentRange.append(x-1)
-                candDict[currentCand] = currentRange
-                currentCand = candidates[x]
-                currentRange = [x]     
-        currentRange.append(len(candidates)-1)
-        candDict[candidates[-1]] = currentRange
-        print(candDict)
-        result = []
-        def helper(i,currentList,currentSum):
-            if currentSum == target:
-                print('adding',currentList)
-                result.append(currentList.copy())
-                return
-            if i >= len(candidates) or currentSum > target:
-                print('no no')
-                return
-            print('looking at index',i,':',candidates[i])
-            
-            # if currentSum + candidates[i] <= target:
-            start = candDict[candidates[i]][0]
-            print('start is',start)
-            end = candDict[candidates[i]][1]
-            print('end is',end)
-            copyList = currentList.copy()
-            for x in range(end-start+1):
-                copyList.append(candidates[i])
-                print('helper for',end+1,copyList,currentSum + (x+1)*candidates[i])
-                helper(end+1,copyList,currentSum + (x+1)*candidates[i])
-            # copyList.append(candidates[i])
-            # helper(i+1,copyList,currentSum + candidates[i])
-            
-            copyList = currentList.copy()
-            print('helper for',end+1,copyList,currentSum)
-            helper(end+1,copyList,currentSum)
-            
-        helper(0,[],0)
-        return result
+    def orangesRotting(self, grid: List[List[int]]) -> int:
 
-s = Solution()
-print(s.combinationSum2([1,2,2,2,2,2,2,5],5))
+        m = len(grid)
+        n = len(grid[0])
+
+        count = 0
+        freshCount = 0
+
+        bufferQ = deque()
+
+        for x in range(m):
+            for y in range(n):
+                if grid[x][y] == 2:
+                    bufferQ.append([x, y])
+                elif grid[x][y] == 1:
+                    freshCount += 1
+
+        while len(bufferQ) != 0:
+            if freshCount == 0:
+                return count
+            count += 1
+            workingQ = deque()
+
+            while len(bufferQ) != 0:
+                el = bufferQ.popleft()
+                workingQ.append(el)
+
+            while len(workingQ) != 0:
+
+                currentX, currentY = workingQ.popleft()
+                for xMove, yMove in [[1, 0], [0, 1], [-1, 0], [0, -1]]:
+                    if (
+                        not (
+                            (0 > currentX + xMove)
+                            or (currentX + xMove >= m)
+                            or (currentY + yMove < 0)
+                            or (currentY + yMove >= n)
+                        )
+                    ) and grid[currentX + xMove][currentY + yMove] == 1:
+
+                        grid[currentX + xMove][currentY + yMove] = 2
+                        freshCount -= 1
+
+                        bufferQ.append([currentX + xMove, currentY + yMove])
+
+        if freshCount == 0:
+            return count
+
+        return -1
+
+
+# s = Solution()
+# print(s.orangesRotting([[2, 1, 1], [1, 1, 0], [0, 1, 1]]))
